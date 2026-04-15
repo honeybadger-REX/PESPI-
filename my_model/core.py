@@ -37,15 +37,10 @@ def file_load(cap,output_filename,outfil_location):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
 
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    if not output_filename:
-        out = cv2.VideoWriter('output.mp4', fourcc, fps, (width, height))
-    else:
-        out = cv2.VideoWriter(f'{output_filename}.mp4', fourcc, fps, (width, height))
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
+    out = cv2.VideoWriter(f'{output_filename}.mp4', fourcc, fps, (width, height))
     filepath = ""
-    if not outfil_location:
-        filepath = "image"
-    else:
+    if  outfil_location:
         filepath = outfil_location
     os.makedirs(filepath, exist_ok=True)
 

@@ -5,6 +5,7 @@ from pymongo import  MongoClient
 from .core import load_model, vedio_load, file_load, process_frame
 from .def_file import DMP ,DVP,DB_COLL
 from datetime import datetime
+from .database import DB_local , DB_mongo
 
 # THis  funtion is  use  to load  file  and  save  output  in  mongodb  and localy  also   and  it is  call under  vehical_dection_fn
 def data_procesing(result,filepath,frame,out,save,save_mongodb,collection):
@@ -31,28 +32,19 @@ def data_procesing(result,filepath,frame,out,save,save_mongodb,collection):
 
         if trackid not in seen_ids :
             if save == True:
-                seen_ids.add(trackid)
-                filename = f"frame_{trackid}.jpg"
-                imagepath = os.path.join(filepath,filename)
-                cv2.imwrite(imagepath,frame)
+                seen_ids  = DB_local(seen_ids,trackid,filepath,frame)
+                
 
             if cof > 0.7 :
                 cv2.rectangle(frame, (x1,y1),(x2,y2),(0,255,0),2)
                 cv2.putText(frame, f"{cls}:{cof:.2f}", (x1, y1-10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
                 if save_mongodb == True:
-                    objct = { "track_id" : trackid,"class" : classes,"confidens" : float(cof),"bbox": {
-                          "x1": int(x1),
-                          "y1": int(y1),
-                          "x2": int(x2),
-                          "y2": int(y2)},
-                          "image_path" : imagepath,"timestand" : datetime.now()}
-                    collection.insertOne(objct)
-                cv2.imshow("Detection", frame)
+                    DB_mongo(trackid,cof,classes,x1,x2,y1,y2,imagepath)
                 data.extend(frame)
                 out.write(frame)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
     out.release()
     cv2.destroyAllWindows()

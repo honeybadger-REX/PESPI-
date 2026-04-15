@@ -7,5 +7,5 @@ USE_GPU = True
 SAVE_OUTPUT = True
 
 MONGO_URL = "mongodb://localhost:27017"
-DB_NAME = "vehicle_live_data"
+DB_NAME = "vehical_live_data"
 DB_COLL = "vehical_live"

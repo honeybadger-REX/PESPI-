@@ -15,5 +15,5 @@ def mongo_setup(mgaddres = MONGO_URL, dbs = DB_NAME, collections = DB_COLL):
         print("use collection")
     except Exception as e:
         print(F"MOngoDB fail to  connect : {e}")
-    return  collection
+    return  collections
 
