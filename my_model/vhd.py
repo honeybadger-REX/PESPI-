@@ -3,12 +3,15 @@ import torch
 import cv2
 from pymongo import  MongoClient
 from .core import load_model, vedio_load, file_load, process_frame
-from .def_file import DMP ,DVP,DB_COLL
+from .def_file import DMP ,DVP,DB_COLL ,MONGO_URL,DB_NAME
 from datetime import datetime
 from .database import DB_local , DB_mongo
+from .mongo_con import mongo_setup
+
 
 # THis  funtion is  use  to load  file  and  save  output  in  mongodb  and localy  also   and  it is  call under  vehical_dection_fn
-def data_procesing(result,filepath,frame,out,save,save_mongodb,collection):
+def data_procesing(result,filepath,frame,out,save,save_mongodb,COLL):
+
     # Store unique IDs
     seen_ids = set()
     classes = ""
@@ -39,8 +42,9 @@ def data_procesing(result,filepath,frame,out,save,save_mongodb,collection):
                 cv2.rectangle(frame, (x1,y1),(x2,y2),(0,255,0),2)
                 cv2.putText(frame, f"{cls}:{cof:.2f}", (x1, y1-10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
+         
                 if save_mongodb == True:
-                    DB_mongo(trackid,cof,classes,x1,x2,y1,y2,imagepath)
+                    DB_mongo(trackid,cof,classes,x1,x2,y1,y2,COLL)
                 data.extend(frame)
                 out.write(frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -49,12 +53,13 @@ def data_procesing(result,filepath,frame,out,save,save_mongodb,collection):
     out.release()
     cv2.destroyAllWindows()
     if save == True:
+        print(seen_ids)
         return data ,seen_ids
     else:
         return data, 0 
 
 # main  funtion under  whihc  all the  funtion  ar  called and  work  in  proper flow
-def  vhd_fn(model_path = DMP , video_path = DVP,save_name = ".out",save_location=r"D:\test-area-v1",save = True,save_mongodb = True,COLL=DB_COLL):
+def  vhd_fn(COLL,model_path = DMP , video_path = DVP,save_name = ".out",save_location=r"D:\test-area-v1",save = True,save_mongodb = True):
 
     model = load_model(model_path)
     cap = vedio_load(video_path)
@@ -73,7 +78,9 @@ def  vhd_fn(model_path = DMP , video_path = DVP,save_name = ".out",save_location
             break
         frame = cv2.resize(frame, (640, 360))
         result = process_frame(model, frame)
+        
         data ,seen_ids = data_procesing(result,filepath,frame,out,save,save_mongodb,COLL)
     cap.release()
+    print(seen_ids)
     print(f"Done! Output saved as {filepath}.mp4")
 
