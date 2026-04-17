@@ -9,9 +9,10 @@ from .database import DB_local , DB_mongo
 from .mongo_con import mongo_setup
 
 
-# THis  funtion is  use  to load  file  and  save  output  in  mongodb  and localy  also   and  it is  call under  vehical_dection_fn
-def data_procesing(result,filepath,frame,out,save,save_mongodb,COLL):
 
+# THis  funtion is  use  to load  file  and  save  output  in  mongodb  and localy  also   and  it is  call under  vehical_dection_fn
+def data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,COLL):
+    imagepath = os.path.join(save_location,save_name)
     # Store unique IDs
     seen_ids = set()
     classes = ""
@@ -31,11 +32,11 @@ def data_procesing(result,filepath,frame,out,save,save_mongodb,COLL):
         else:
             classes = "medium"
 
-
+     
 
         if trackid not in seen_ids :
             if save == True:
-                seen_ids  = DB_local(seen_ids,trackid,filepath,frame)
+                seen_ids  = DB_local(seen_ids,trackid,save_location,save_name,frame)
                 
 
             if cof > 0.7 :
@@ -79,8 +80,8 @@ def  vhd_fn(COLL,model_path = DMP , video_path = DVP,save_name = ".out",save_loc
         frame = cv2.resize(frame, (640, 360))
         result = process_frame(model, frame)
         
-        data ,seen_ids = data_procesing(result,filepath,frame,out,save,save_mongodb,COLL)
+        data ,seen_ids = data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,COLL)
     cap.release()
     print(seen_ids)
-    print(f"Done! Output saved as {filepath}.mp4")
+    print(f"Done! OutHHHHHput saved as {filepath}.mp4")
 

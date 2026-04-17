@@ -1,12 +1,10 @@
 
 from pymongo import MongoClient
-from .def_file import DMP ,DVP,DB_COLL ,MONGO_URL,DB_NAME
-print(DB_NAME,DB_COLL)
 #from .database import DB_mongo
 
 
 # This function is used to connect to MongoDBc
-def mongo_setup(mgaddres ='mongodb+srv://priyanshbadger257:12345@cluster0.8vmpyzh.mongodb.net/?appName=Cluster0',DB_NAME ="vehical_live_data",DB_COLL ="vehical_live"):
+def mongo_setup(mgaddres ='mongodb://localhost:27017/',DB_NAME ="vehical_live_data",DB_COLL ="vehical_live"):
 
     if not mgaddres :
         raise ValueError("All parameters (mgaddres, dbs, collections) are required!")

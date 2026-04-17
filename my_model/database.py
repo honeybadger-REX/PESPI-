@@ -24,7 +24,7 @@ def DB_mongo(trackid, cof, classes, x1, x2, y1, y2, collection):
         "image_path": imagepath,
         "timestand": datetime.now()
     }
-    collection = db
+    
     # Ensure collection is valid before inserting
     if collection is not None:
         try:
@@ -35,7 +35,8 @@ def DB_mongo(trackid, cof, classes, x1, x2, y1, y2, collection):
     else:
         print("Invalid MongoDB collection provided.")
 
-def DB_local(seen_ids, trackid, filepath, frame):
+def DB_local(seen_ids, trackid,save_location,save_name,frame):
+    filepath = os.path.join(save_location,save_name)
     seen_ids.add(trackid)
     filename = f"frame_{trackid}.jpg"
     imagepath = os.path.join(filepath, filename)
