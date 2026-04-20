@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def chartes(df):
-  df  = pd.read_json(file_path)
+  
   df.drop(index=0, inplace=True)
   fg = ["bbox","image_path","_id","test"]
   df.drop(columns=fg, inplace=True)
@@ -14,7 +14,7 @@ def chartes(df):
   return  df 
 
 
-def bar_cahrt(df):
+def bar_chart(df):
   plt.figure(figsize=(10, 6))
   class_counts = df['class'].value_counts()
   plt.bar(class_counts.index, class_counts.values)
