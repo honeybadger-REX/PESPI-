@@ -1,9 +1,16 @@
 from fastapi import APIRouter
-from db import detections
+from db import vehical_data
 
 router = APIRouter()
 
 @router.get("/vehicle")
 def get_vehicle_data():
-    data = list(detections.find({"class": "vehicle"}, {"_id": 0}))
+    data = list(
+        vehical_data.find(
+            {
+                "class": {"$in": ["heavy", "medium", "light"]}
+            },
+            {"_id" : 0}
+        )
+    )
     return data
