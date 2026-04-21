@@ -14,13 +14,8 @@ def mongo_setup(mgaddres ='mongodb://localhost:27017/',DB_NAME ="vehical_live_da
         collection = db[DB_COLL]
 
         # Test data to insert
-        test_data = {"test": "data"}
-        result = collection.insert_one(test_data)
-        print(f"Data inserted successfully with ID: {result.inserted_id}")
-
-
-
-
+        
+        
 # islolation test 
   #      trackid = 1
    #     cof = 0.95
@@ -36,7 +31,7 @@ def mongo_setup(mgaddres ='mongodb://localhost:27017/',DB_NAME ="vehical_live_da
         client.admin.command('ping')
         print("MongoDB connected successfully")
 
-        return collection  # Return the collection object
+        return collection , db   # Return the collection object
     except Exception as e:
         print(f"MongoDB operation failed: {e}")
         return None  # Return None if connection fail

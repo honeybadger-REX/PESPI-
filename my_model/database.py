@@ -3,6 +3,8 @@ import torch
 import cv2
 from pymongo import MongoClient
 from datetime import datetime
+from .mongo_con import mongo_setup
+
 
 
 # Ensure imagepath is assigned a valid value before use
@@ -23,9 +25,11 @@ def DB_mongo(trackid, cof, classes, x1, x2, y1, y2, collection):
         },
         "image_path": imagepath,
         "timestand": datetime.now()
+
     }
     
-    # Ensure collection is valid before inserting
+
+    
     if collection is not None:
         try:
             collection.insert_one(objct)
@@ -34,6 +38,9 @@ def DB_mongo(trackid, cof, classes, x1, x2, y1, y2, collection):
             print(f"Error inserting document into MongoDB: {e}")
     else:
         print("Invalid MongoDB collection provided.")
+
+
+
 
 def DB_local(seen_ids, trackid,save_location,save_name,frame):
     filepath = os.path.join(save_location,save_name)

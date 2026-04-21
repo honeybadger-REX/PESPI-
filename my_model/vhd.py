@@ -6,12 +6,14 @@ from .core import load_model, vedio_load, file_load, process_frame
 from .def_file import DMP ,DVP,DB_COLL ,MONGO_URL,DB_NAME
 from datetime import datetime
 from .database import DB_local , DB_mongo
-from .mongo_con import mongo_setup
+import pandas as pd 
+from .chartess import chartes  
+
 
 
 
 # THis  funtion is  use  to load  file  and  save  output  in  mongodb  and localy  also   and  it is  call under  vehical_dection_fn
-def data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,COLL):
+def data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,COLL,db):
     imagepath = os.path.join(save_location,save_name)
     # Store unique IDs
     seen_ids = set()
@@ -37,7 +39,7 @@ def data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,CO
         if trackid not in seen_ids :
             if save == True:
                 seen_ids  = DB_local(seen_ids,trackid,save_location,save_name,frame)
-                
+
 
             if cof > 0.7 :
                 cv2.rectangle(frame, (x1,y1),(x2,y2),(0,255,0),2)
@@ -46,6 +48,8 @@ def data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,CO
          
                 if save_mongodb == True:
                     DB_mongo(trackid,cof,classes,x1,x2,y1,y2,COLL)
+                    chartes(COLL,db,True)
+                    
                 data.extend(frame)
                 out.write(frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -60,7 +64,7 @@ def data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,CO
         return data, 0 
 
 # main  funtion under  whihc  all the  funtion  ar  called and  work  in  proper flow
-def  vhd_fn(COLL,model_path = DMP , video_path = DVP,save_name = ".out",save_location=r"D:\test-area-v1",save = True,save_mongodb = True):
+def  vhd_fn(COLL,db,model_path = DMP , video_path = DVP,save_name = ".out",save_location=r"D:\test-area-v1",save = True,save_mongodb = True):
 
     model = load_model(model_path)
     cap = vedio_load(video_path)
@@ -80,7 +84,7 @@ def  vhd_fn(COLL,model_path = DMP , video_path = DVP,save_name = ".out",save_loc
         frame = cv2.resize(frame, (640, 360))
         result = process_frame(model, frame)
         
-        data ,seen_ids = data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,COLL)
+        data ,seen_ids = data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,COLL,db)
     cap.release()
     print(seen_ids)
     print(f"Done! OutHHHHHput saved as {filepath}.mp4")
