@@ -9,14 +9,13 @@ from .database import DB_local , DB_mongo
 import pandas as pd 
 from .chartess import chartes  
 
-
-
+track_id = {}
 
 # THis  funtion is  use  to load  file  and  save  output  in  mongodb  and localy  also   and  it is  call under  vehical_dection_fn
-def data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,COLL,db):
+def data_procesing(globale,result,save_location,save_name,frame,out,save,save_mongodb,COLL,db):
     imagepath = os.path.join(save_location,save_name)
     # Store unique IDs
-    seen_ids = set()
+    
     classes = ""
     data = []
     boxes = result[0].boxes
@@ -33,13 +32,16 @@ def data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,CO
             classes = "heavy"
         else:
             classes = "medium"
+          
+        if globale not in track_id:
+            track_id[globale] = set()
 
-     
-
-        if trackid not in seen_ids :
+        if trackid not in track_id[globale]:
+            track_id[globale].add(trackid) 
+            
             if save == True:
-                seen_ids  = DB_local(seen_ids,trackid,save_location,save_name,frame)
-
+                DB_local( globale,trackid,save_location,save_name,frame)
+            
 
             if cof > 0.7 :
                 cv2.rectangle(frame, (x1,y1),(x2,y2),(0,255,0),2)
@@ -58,8 +60,7 @@ def data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,CO
     out.release()
     cv2.destroyAllWindows()
     if save == True:
-        print(seen_ids)
-        return data ,seen_ids
+        return data , globale
     else:
         return data, 0 
 
@@ -71,6 +72,9 @@ def  vhd_fn(COLL,db,model_path = DMP , video_path = DVP,save_name = ".out",save_
     out , filepath = file_load(cap,save_name,save_location)
         # Store unique IDs
     frame_count =  0
+    box_map = {}
+    
+    globale = 0
 
 
 
@@ -83,9 +87,12 @@ def  vhd_fn(COLL,db,model_path = DMP , video_path = DVP,save_name = ".out",save_
             break
         frame = cv2.resize(frame, (640, 360))
         result = process_frame(model, frame)
-        
-        data ,seen_ids = data_procesing(result,save_location,save_name,frame,out,save,save_mongodb,COLL,db)
-    cap.release()
-    print(seen_ids)
-    print(f"Done! OutHHHHHput saved as {filepath}.mp4")
+        globale += 100
+        print(frame_count)
+        data ,  globale = data_procesing( globale,result,save_location,save_name,frame,out,save,save_mongodb,COLL,db)
 
+
+    cap.release()
+    
+    print(f"Done! OutHHHHHput saved as {filepath}.mp4")
+    print(track_id)

@@ -29,7 +29,15 @@ def DB_mongo(trackid, cof, classes, x1, x2, y1, y2, collection):
     }
     
 
-    
+    collectionv,db  = mongo_setup(mgaddres ='mongodb://localhost:27017/',DB_NAME ="Pavilion_mangment_dataset",DB_COLL="vehical_data")
+    object2 = {
+        "track_id": trackid,
+        "class": classes,
+        "confidens": float(cof),
+        "timestand": datetime.now()}
+    # Ensure collection is valid before inserting
+    if collectionv is not None:
+        collectionv.insert_one(object2)
     if collection is not None:
         try:
             collection.insert_one(objct)
@@ -42,12 +50,11 @@ def DB_mongo(trackid, cof, classes, x1, x2, y1, y2, collection):
 
 
 
-def DB_local(seen_ids, trackid,save_location,save_name,frame):
+def DB_local(globale, trackid,save_location,save_name,frame):
     filepath = os.path.join(save_location,save_name)
-    seen_ids.add(trackid)
-    filename = f"frame_{trackid}.jpg"
+    filename = f"frame_{globale+trackid}.jpg"
     imagepath = os.path.join(filepath, filename)
     cv2.imwrite(imagepath, frame)
-    return seen_ids
+
 
 
